@@ -1,0 +1,20 @@
+# Scan configuration for codeforindia-beige.vercel.app
+target:
+  url: "https://codeforindia-beige.vercel.app"
+  context_name: "CodeForIndia_Scan"
+  include_regex: "https://codeforindia-beige\\.vercel\\.app.*"
+
+auth: null
+
+zap:
+  api_url: "http://localhost:8080"
+  api_key: "changeme123"
+
+scan:
+  spider: true
+  ajax_spider: true
+  active_scan: true
+
+report:
+  output_dir: "reports"
+  filename: "zap_scan_report.html"
