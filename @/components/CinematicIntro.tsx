@@ -8,7 +8,7 @@ interface CinematicIntroProps {
 
 export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
   const [isExiting, setIsExiting] = useState<boolean>(false);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isAutoplayBlocked, setIsAutoplayBlocked] = useState<boolean>(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const progressFillRef = useRef<HTMLDivElement | null>(null);
@@ -26,32 +26,36 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
     }, 700);
   }, [isExiting, onEnter]);
 
-  // Ensure audio is unmuted and at full volume
-  const ensureAudioOn = useCallback(() => {
+  // Ensure audio is fully unmuted and playing
+  const enableAudio = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
+
     video.muted = false;
     video.volume = 1;
+    setIsAutoplayBlocked(false);
+
     if (video.paused) {
       video.play().catch(() => {});
     }
   }, []);
 
-  // Keyboard shortcut: Enter to enter portfolio
+  // Keyboard accessibility
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         handleEnter();
       } else {
-        ensureAudioOn();
+        enableAudio();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleEnter, ensureAudioOn]);
+  }, [handleEnter, enableAudio]);
 
-  // Immediate and aggressive unmuted audio playback
+  // Play unmuted on mount; if browser autoplay policy blocks unmuted audio on cold start,
+  // show prompt and unlock immediately on the very first touch/click anywhere on screen
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -62,47 +66,41 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
     const startPlayback = async () => {
       try {
         await video.play();
-        setIsPlaying(true);
+        setIsAutoplayBlocked(false);
       } catch {
-        // If browser autoplay policy prevents audio on cold load without prior interaction,
-        // start playback muted so video runs immediately, then unmute on ANY movement or gesture
+        // Browser requires a user gesture for sound:
+        // Start video running and show prompt so user knows sound is 1 tap away
         video.muted = true;
         try {
           await video.play();
-          setIsPlaying(true);
         } catch {
-          setIsPlaying(false);
+          // Play failed
         }
+        setIsAutoplayBlocked(true);
 
-        const enableAudio = () => {
+        const onUserGesture = () => {
           if (videoRef.current) {
             videoRef.current.muted = false;
             videoRef.current.volume = 1;
             videoRef.current.play().catch(() => {});
           }
-          window.removeEventListener('pointerdown', enableAudio);
-          window.removeEventListener('touchstart', enableAudio);
-          window.removeEventListener('click', enableAudio);
-          window.removeEventListener('mousemove', enableAudio);
-          window.removeEventListener('scroll', enableAudio);
-          window.removeEventListener('wheel', enableAudio);
-          window.removeEventListener('keydown', enableAudio);
+          setIsAutoplayBlocked(false);
+
+          window.removeEventListener('pointerdown', onUserGesture);
+          window.removeEventListener('touchstart', onUserGesture);
+          window.removeEventListener('click', onUserGesture);
         };
 
-        window.addEventListener('pointerdown', enableAudio, { once: true, passive: true });
-        window.addEventListener('touchstart', enableAudio, { once: true, passive: true });
-        window.addEventListener('click', enableAudio, { once: true, passive: true });
-        window.addEventListener('mousemove', enableAudio, { once: true, passive: true });
-        window.addEventListener('scroll', enableAudio, { once: true, passive: true });
-        window.addEventListener('wheel', enableAudio, { once: true, passive: true });
-        window.addEventListener('keydown', enableAudio, { once: true, passive: true });
+        window.addEventListener('pointerdown', onUserGesture, { once: true, passive: true });
+        window.addEventListener('touchstart', onUserGesture, { once: true, passive: true });
+        window.addEventListener('click', onUserGesture, { once: true, passive: true });
       }
     };
 
     startPlayback();
   }, []);
 
-  // Direct DOM update for progress bar to prevent re-renders
+  // Direct DOM update for progress bar to eliminate React re-render lag
   const handleTimeUpdate = () => {
     const video = videoRef.current;
     const progressFill = progressFillRef.current;
@@ -117,7 +115,6 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
 
   // When video completes, directly enter the portfolio automatically
   const handleVideoEnded = () => {
-    setIsPlaying(false);
     if (progressFillRef.current) {
       progressFillRef.current.style.width = '100%';
     }
@@ -130,13 +127,10 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
       role="dialog"
       aria-modal="true"
       aria-label="Vetrivelan DM Introduction"
+      onClick={enableAudio}
     >
       {/* Fullscreen Video Background */}
-      <div
-        className="intro-fullscreen-video-container"
-        onClick={ensureAudioOn}
-        role="presentation"
-      >
+      <div className="intro-fullscreen-video-container" role="presentation">
         <video
           ref={videoRef}
           src={introVideo || 'assets/vetrivelan-intro.mp4'}
@@ -147,11 +141,30 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
           preload="auto"
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleVideoEnded}
-          onPlay={() => setIsPlaying(true)}
           aria-label="Vetrivelan DM introduction video"
         />
         <div className="intro-fullscreen-overlay" aria-hidden="true" />
       </div>
+
+      {/* If browser autoplay policy blocked sound on cold load, prominent prompt to unlock audio */}
+      {isAutoplayBlocked && (
+        <button
+          type="button"
+          className="intro-unmute-prompt"
+          onClick={(e) => {
+            e.stopPropagation();
+            enableAudio();
+          }}
+          aria-label="Tap to enable audio"
+        >
+          <svg className="intro-prompt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+          </svg>
+          <span>TAP ANYWHERE FOR SOUND</span>
+        </button>
+      )}
 
       {/* Subtle Corner Architectural Accents */}
       <div className="intro-corner-accent intro-corner-tl" aria-hidden="true" />
@@ -169,12 +182,15 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
         <div className="intro-header-right">
           <span className="intro-location-tag">CHENNAI, IN &bull; 16+ YRS</span>
           {/* Always Audio On Indicator */}
-          <button
-            type="button"
+          <div
             className="intro-audio-btn is-unmuted"
-            onClick={ensureAudioOn}
-            aria-label="Audio is on"
-            title="Audio is enabled"
+            onClick={(e) => {
+              e.stopPropagation();
+              enableAudio();
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Audio active"
           >
             <svg className="intro-audio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
@@ -183,7 +199,7 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
             </svg>
             <span>AUDIO ON</span>
             <span className="intro-audio-pulse" aria-hidden="true" />
-          </button>
+          </div>
         </div>
       </header>
 
@@ -193,7 +209,10 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
           <button
             type="button"
             className="intro-btn-enter"
-            onClick={handleEnter}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleEnter();
+            }}
             autoFocus
             aria-label="Enter portfolio"
           >
