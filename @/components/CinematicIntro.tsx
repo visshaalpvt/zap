@@ -7,8 +7,6 @@ interface CinematicIntroProps {
 }
 
 export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
-  // Always unmuted by default
-  const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isExiting, setIsExiting] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
@@ -28,47 +26,32 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
     }, 700);
   }, [isExiting, onEnter]);
 
-  // Audio unmute toggle
-  const toggleAudio = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!videoRef.current) return;
-
-    if (isMuted) {
-      videoRef.current.muted = false;
-      setIsMuted(false);
-      videoRef.current.play().catch(() => {});
-    } else {
-      videoRef.current.muted = true;
-      setIsMuted(true);
+  // Ensure audio is unmuted and at full volume
+  const ensureAudioOn = useCallback(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = false;
+    video.volume = 1;
+    if (video.paused) {
+      video.play().catch(() => {});
     }
-  };
-
-  // Tap anywhere on video to unmute or resume
-  const handleVideoAreaClick = () => {
-    if (videoRef.current) {
-      if (isMuted) {
-        videoRef.current.muted = false;
-        setIsMuted(false);
-        videoRef.current.play().catch(() => {});
-      } else if (videoRef.current.paused) {
-        videoRef.current.play().catch(() => {});
-      }
-    }
-  };
+  }, []);
 
   // Keyboard shortcut: Enter to enter portfolio
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         handleEnter();
+      } else {
+        ensureAudioOn();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleEnter]);
+  }, [handleEnter, ensureAudioOn]);
 
-  // High performance playback initialization
+  // Immediate and aggressive unmuted audio playback
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -80,11 +63,10 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
       try {
         await video.play();
         setIsPlaying(true);
-        setIsMuted(false);
       } catch {
-        // Fallback for browsers enforcing user-gesture before sound
+        // If browser autoplay policy prevents audio on cold load without prior interaction,
+        // start playback muted so video runs immediately, then unmute on ANY movement or gesture
         video.muted = true;
-        setIsMuted(true);
         try {
           await video.play();
           setIsPlaying(true);
@@ -92,23 +74,28 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
           setIsPlaying(false);
         }
 
-        const unmuteOnInteraction = () => {
+        const enableAudio = () => {
           if (videoRef.current) {
             videoRef.current.muted = false;
             videoRef.current.volume = 1;
-            setIsMuted(false);
             videoRef.current.play().catch(() => {});
           }
-          window.removeEventListener('pointerdown', unmuteOnInteraction);
-          window.removeEventListener('touchstart', unmuteOnInteraction);
-          window.removeEventListener('click', unmuteOnInteraction);
-          window.removeEventListener('keydown', unmuteOnInteraction);
+          window.removeEventListener('pointerdown', enableAudio);
+          window.removeEventListener('touchstart', enableAudio);
+          window.removeEventListener('click', enableAudio);
+          window.removeEventListener('mousemove', enableAudio);
+          window.removeEventListener('scroll', enableAudio);
+          window.removeEventListener('wheel', enableAudio);
+          window.removeEventListener('keydown', enableAudio);
         };
 
-        window.addEventListener('pointerdown', unmuteOnInteraction, { once: true, passive: true });
-        window.addEventListener('touchstart', unmuteOnInteraction, { once: true, passive: true });
-        window.addEventListener('click', unmuteOnInteraction, { once: true, passive: true });
-        window.addEventListener('keydown', unmuteOnInteraction, { once: true, passive: true });
+        window.addEventListener('pointerdown', enableAudio, { once: true, passive: true });
+        window.addEventListener('touchstart', enableAudio, { once: true, passive: true });
+        window.addEventListener('click', enableAudio, { once: true, passive: true });
+        window.addEventListener('mousemove', enableAudio, { once: true, passive: true });
+        window.addEventListener('scroll', enableAudio, { once: true, passive: true });
+        window.addEventListener('wheel', enableAudio, { once: true, passive: true });
+        window.addEventListener('keydown', enableAudio, { once: true, passive: true });
       }
     };
 
@@ -147,7 +134,7 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
       {/* Fullscreen Video Background */}
       <div
         className="intro-fullscreen-video-container"
-        onClick={handleVideoAreaClick}
+        onClick={ensureAudioOn}
         role="presentation"
       >
         <video
@@ -156,7 +143,6 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
           className="intro-fullscreen-video"
           playsInline
           autoPlay
-          muted={isMuted}
           loop={false}
           preload="auto"
           onTimeUpdate={handleTimeUpdate}
@@ -173,7 +159,7 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
       <div className="intro-corner-accent intro-corner-bl" aria-hidden="true" />
       <div className="intro-corner-accent intro-corner-br" aria-hidden="true" />
 
-      {/* Top Architectural Header Bar (Badge removed as requested) */}
+      {/* Top Architectural Header Bar */}
       <header className="intro-header-bar">
         <div className="intro-system-tag">
           <span className="intro-pulse-dot" aria-hidden="true" />
@@ -182,39 +168,26 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
 
         <div className="intro-header-right">
           <span className="intro-location-tag">CHENNAI, IN &bull; 16+ YRS</span>
-          {/* Sound / Unmute Control Button */}
+          {/* Always Audio On Indicator */}
           <button
             type="button"
-            className={`intro-audio-btn ${!isMuted ? 'is-unmuted' : ''}`}
-            onClick={toggleAudio}
-            aria-label={isMuted ? 'Unmute introduction audio' : 'Mute introduction audio'}
-            title={isMuted ? 'Click to unmute' : 'Mute audio'}
+            className="intro-audio-btn is-unmuted"
+            onClick={ensureAudioOn}
+            aria-label="Audio is on"
+            title="Audio is enabled"
           >
-            {isMuted ? (
-              <>
-                <svg className="intro-audio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
-                  <line x1="23" y1="9" x2="17" y2="15" />
-                  <line x1="17" y1="9" x2="23" y2="15" />
-                </svg>
-                <span>UNMUTE</span>
-              </>
-            ) : (
-              <>
-                <svg className="intro-audio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
-                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                </svg>
-                <span>AUDIO ON</span>
-                <span className="intro-audio-pulse" aria-hidden="true" />
-              </>
-            )}
+            <svg className="intro-audio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+            </svg>
+            <span>AUDIO ON</span>
+            <span className="intro-audio-pulse" aria-hidden="true" />
           </button>
         </div>
       </header>
 
-      {/* Bottom CTA Actions - Middle text barrier removed so video is clear and unobstructed */}
+      {/* Bottom CTA Actions */}
       <main className="intro-main-content">
         <div className="intro-actions">
           <button
