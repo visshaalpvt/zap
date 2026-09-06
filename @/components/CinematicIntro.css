@@ -1,0 +1,532 @@
+/* Cinematic Pre-Portfolio Intro Experience - Fullscreen Immersive */
+:root {
+  --intro-bg: #0D0B17;
+  --intro-card-bg: #11101C;
+  --intro-violet-deep: #4C1D95;
+  --intro-violet: #7C3AED;
+  --intro-violet-light: #8B5CF6;
+  --intro-indigo: #4F46E5;
+  --intro-text: #F5F3FF;
+  --intro-muted: #A8A3B8;
+  --intro-lime: #c8f45a;
+}
+
+/* Base Fullscreen Intro Overlay */
+.cinematic-intro-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background-color: var(--intro-bg);
+  color: var(--intro-text);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  box-sizing: border-box;
+  overflow: hidden;
+  opacity: 1;
+  transform: scale(1) translate3d(0, 0, 0);
+  -webkit-transform: scale(1) translate3d(0, 0, 0);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.cinematic-intro-wrapper.is-exiting {
+  opacity: 0;
+  transform: scale(1.03) translate3d(0, 0, 0);
+  -webkit-transform: scale(1.03) translate3d(0, 0, 0);
+  pointer-events: none;
+}
+
+/* Fullscreen Video Background Container */
+.intro-fullscreen-video-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+  cursor: pointer;
+  background-color: #05040a;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+}
+
+.intro-fullscreen-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 36%;
+  background-color: #05040a;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+/* Subtle Cinematic Vignette Overlay to ensure text readability */
+.intro-fullscreen-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: 
+    linear-gradient(180deg, rgba(13, 11, 23, 0.85) 0%, rgba(13, 11, 23, 0.3) 20%, transparent 40%),
+    linear-gradient(0deg, #0D0B17 0%, rgba(13, 11, 23, 0.92) 26%, rgba(13, 11, 23, 0.45) 55%, transparent 75%),
+    radial-gradient(circle at 50% 45%, transparent 35%, rgba(13, 11, 23, 0.5) 80%, rgba(13, 11, 23, 0.9) 100%);
+}
+
+/* Corner architectural accents */
+.intro-corner-accent {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: rgba(139, 92, 246, 0.35);
+  pointer-events: none;
+  z-index: 10;
+}
+.intro-corner-tl { top: 16px; left: 16px; border-top: 1.5px solid; border-left: 1.5px solid; }
+.intro-corner-tr { top: 16px; right: 16px; border-top: 1.5px solid; border-right: 1.5px solid; }
+.intro-corner-bl { bottom: 16px; left: 16px; border-bottom: 1.5px solid; border-left: 1.5px solid; }
+.intro-corner-br { bottom: 16px; right: 16px; border-bottom: 1.5px solid; border-right: 1.5px solid; }
+
+/* Top Header Bar */
+.intro-header-bar {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+
+.intro-system-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--intro-muted);
+  text-transform: uppercase;
+}
+
+.intro-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--intro-lime);
+  box-shadow: 0 0 8px var(--intro-lime);
+  display: inline-block;
+  animation: introPulse 2.4s infinite ease-in-out;
+}
+
+.intro-header-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.intro-video-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: rgba(245, 243, 255, 0.85);
+  background: rgba(13, 11, 23, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  pointer-events: none;
+}
+
+.intro-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.intro-location-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--intro-muted);
+  opacity: 0.85;
+}
+
+/* Audio Control Pill */
+.intro-audio-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 15px;
+  background: rgba(13, 11, 23, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: 9999px;
+  color: var(--intro-text);
+  font-family: 'DM Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.intro-audio-btn:hover,
+.intro-audio-btn:focus-visible {
+  background: rgba(76, 29, 149, 0.65);
+  border-color: var(--intro-violet-light);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.intro-audio-btn.is-unmuted {
+  border-color: rgba(200, 244, 90, 0.8);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(200, 244, 90, 0.25);
+}
+
+.intro-audio-icon {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.intro-audio-pulse {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--intro-lime);
+  margin-left: 2px;
+  animation: introPulse 1.6s infinite ease-in-out;
+}
+
+/* Center / Bottom Content */
+.intro-main-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  max-width: 800px;
+  margin: auto 0 8px;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+/* Architect Identifier */
+.intro-architect-id {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.intro-architect-id h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(12px, 1.4vw, 14px);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--intro-text);
+  margin: 0;
+  text-transform: uppercase;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.intro-architect-id .id-rule {
+  width: 24px;
+  height: 1px;
+  background: rgba(139, 92, 246, 0.5);
+}
+
+/* Intro Typography */
+.intro-meta-block {
+  margin-top: 2px;
+}
+
+.intro-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(22px, 3.6vw, 34px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+  margin: 0 0 6px;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.9);
+}
+
+.intro-statement {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(14px, 1.8vw, 16px);
+  font-weight: 400;
+  color: rgba(245, 243, 255, 0.88);
+  margin: 0 0 10px;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+}
+
+.intro-pillars {
+  font-family: 'DM Mono', monospace;
+  font-size: clamp(9.5px, 1.2vw, 11px);
+  letter-spacing: 0.18em;
+  color: var(--intro-lime);
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(200, 244, 90, 0.35);
+}
+
+/* CTA Actions */
+.intro-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.intro-btn-enter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 38px;
+  background: #FFFFFF;
+  color: #0D0B17;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid #FFFFFF;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 24px rgba(245, 243, 255, 0.25);
+  min-width: 220px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.intro-btn-enter:hover,
+.intro-btn-enter:focus-visible {
+  background: var(--intro-violet-light);
+  color: #FFFFFF;
+  border-color: var(--intro-violet-light);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(139, 92, 246, 0.55);
+  outline: none;
+}
+
+.intro-btn-enter:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.intro-btn-enter span {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.intro-btn-enter:hover span {
+  transform: translateX(4px);
+}
+
+/* Footer info */
+.intro-footer-bar {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: rgba(168, 163, 184, 0.65);
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+
+/* Video Progress Bar */
+.intro-video-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 20;
+}
+
+.intro-video-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--intro-indigo), var(--intro-violet-light), var(--intro-lime));
+  box-shadow: 0 0 8px var(--intro-lime);
+  transition: width 0.1s linear;
+}
+
+/* Pulse animation */
+@keyframes introPulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+/* Mobile & Touch Viewport Optimizations */
+@media (max-width: 768px) {
+  .cinematic-intro-wrapper {
+    padding: 14px 16px 18px;
+  }
+
+  .intro-corner-accent {
+    width: 12px;
+    height: 12px;
+  }
+  .intro-corner-tl { top: 10px; left: 10px; }
+  .intro-corner-tr { top: 10px; right: 10px; }
+  .intro-corner-bl { bottom: 10px; left: 10px; }
+  .intro-corner-br { bottom: 10px; right: 10px; }
+
+  .intro-fullscreen-video {
+    /* Keep speaker centered nicely in portrait viewports */
+    object-position: center 32%;
+  }
+
+  .intro-fullscreen-overlay {
+    background: 
+      linear-gradient(180deg, rgba(13, 11, 23, 0.88) 0%, rgba(13, 11, 23, 0.35) 20%, transparent 42%),
+      linear-gradient(0deg, #0D0B17 0%, rgba(13, 11, 23, 0.94) 34%, rgba(13, 11, 23, 0.5) 60%, transparent 80%),
+      radial-gradient(circle at 50% 40%, transparent 25%, rgba(13, 11, 23, 0.55) 75%, rgba(13, 11, 23, 0.92) 100%);
+  }
+
+  .intro-header-bar {
+    font-size: 8.5px;
+  }
+
+  .intro-header-center {
+    display: none;
+  }
+
+  .intro-location-tag {
+    display: none;
+  }
+
+  .intro-audio-btn {
+    padding: 6px 12px;
+    font-size: 9.5px;
+    gap: 5px;
+  }
+
+  .intro-main-content {
+    margin: auto 0 6px;
+    padding: 0 8px;
+  }
+
+  .intro-architect-id {
+    margin-bottom: 6px;
+    gap: 8px;
+  }
+
+  .intro-architect-id h2 {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+  }
+
+  .intro-architect-id .id-rule {
+    width: 16px;
+  }
+
+  .intro-title {
+    font-size: clamp(19px, 5.2vw, 24px);
+    margin-bottom: 4px;
+    letter-spacing: -0.01em;
+  }
+
+  .intro-statement {
+    font-size: 13.5px;
+    margin-bottom: 8px;
+  }
+
+  .intro-pillars {
+    font-size: 9px;
+    letter-spacing: 0.14em;
+  }
+
+  .intro-actions {
+    margin-top: 14px;
+    width: 100%;
+  }
+
+  .intro-btn-enter {
+    width: 100%;
+    max-width: 290px;
+    padding: 13px 24px;
+    font-size: 12.5px;
+    min-height: 48px;
+    border-radius: 6px;
+  }
+
+  .intro-footer-bar {
+    font-size: 8px;
+    letter-spacing: 0.08em;
+  }
+}
+
+@media (max-width: 480px) {
+  .cinematic-intro-wrapper {
+    padding: 12px 12px 14px;
+  }
+
+  .intro-title {
+    font-size: 18px;
+  }
+
+  .intro-statement {
+    font-size: 12.5px;
+  }
+
+  .intro-btn-enter {
+    max-width: 100%;
+  }
+}
+
+/* Prefers Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .cinematic-intro-wrapper {
+    transform: none !important;
+    transition: opacity 0.4s ease !important;
+  }
+  .cinematic-intro-wrapper.is-exiting {
+    transform: none !important;
+  }
+  .intro-btn-enter {
+    transition: background-color 0.2s ease, color 0.2s ease !important;
+    transform: none !important;
+  }
+  .intro-pulse-dot,
+  .intro-audio-pulse {
+    animation: none !important;
+  }
+}
