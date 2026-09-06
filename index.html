@@ -30,7 +30,7 @@
         <a href="#expertise">Expertise</a>
         <a href="#architecture">Architect</a>
         <a href="#credentials">Credentials</a>
-        <a class="nav-contact" href="mailto:vetrivelandm@gmail.com">Start a conversation <span>↗</span></a>
+        <a class="nav-contact" href="#contact">Start a conversation <span>↗</span></a>
       </nav>
     </header>
 
@@ -340,7 +340,7 @@
           <p class="eyebrow">Have a hard problem?</p>
           <h2>Let’s make the next decision a better one.</h2>
         </div>
-        <a class="button button-light" href="mailto:vetrivelandm@gmail.com">Start a conversation <span>↗</span></a>
+        <a class="button button-light start-conversation-btn" href="mailto:vetrivelandm@gmail.com?subject=Product%20Security%20Architect%20Inquiry">Start a conversation <span>↗</span></a>
       </section>
     </main>
 
@@ -349,6 +349,55 @@
           rel="noreferrer">GitHub</a> / <a href="https://www.linkedin.com/in/vetrivelan-dm-ab3a76161/" target="_blank"
           rel="noreferrer">LinkedIn</a> / <a href="mailto:vetrivelandm@gmail.com">Email</a></span></footer>
   </div>
+
+  <!-- Start a Conversation Interactive Modal -->
+  <div id="conversation-modal-backdrop" class="conversation-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-heading" aria-hidden="true">
+    <div class="conversation-modal">
+      <div class="conversation-modal-header">
+        <div>
+          <span class="eyebrow" style="margin-bottom: 4px; display: inline-block;">GET IN TOUCH</span>
+          <h3 id="modal-heading" class="conversation-modal-title">Start a Conversation</h3>
+          <p class="conversation-modal-subtitle">Direct collaboration on product security architecture.</p>
+        </div>
+        <button type="button" id="modal-close-btn" class="conversation-modal-close" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <div class="conversation-modal-options">
+        <a class="conversation-opt-btn primary-opt" href="mailto:vetrivelandm@gmail.com?subject=Product%20Security%20Architect%20Inquiry%20-%20Vetrivelan%20DM" target="_blank" rel="noopener">
+          <div class="conversation-opt-left">
+            <span class="conversation-opt-icon">✉️</span>
+            <span>Send via Default Email App</span>
+          </div>
+          <span class="conversation-opt-arrow">↗</span>
+        </a>
+
+        <a class="conversation-opt-btn" href="https://mail.google.com/mail/?view=cm&fs=1&to=vetrivelandm@gmail.com&su=Product%20Security%20Architect%20Inquiry" target="_blank" rel="noopener">
+          <div class="conversation-opt-left">
+            <span class="conversation-opt-icon">🌐</span>
+            <span>Open in Web Gmail</span>
+          </div>
+          <span class="conversation-opt-arrow">↗</span>
+        </a>
+
+        <button type="button" id="copy-email-btn" class="conversation-opt-btn">
+          <div class="conversation-opt-left">
+            <span class="conversation-opt-icon">📋</span>
+            <span id="copy-email-text">Copy vetrivelandm@gmail.com</span>
+          </div>
+          <span id="copy-badge" class="conversation-copy-badge">COPY</span>
+        </button>
+
+        <a class="conversation-opt-btn" href="https://www.linkedin.com/in/vetrivelan-dm-ab3a76161/" target="_blank" rel="noopener">
+          <div class="conversation-opt-left">
+            <span class="conversation-opt-icon">💼</span>
+            <span>Message on LinkedIn</span>
+          </div>
+          <span class="conversation-opt-arrow">↗</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="/script.js"></script>
   <script type="module" src="/src/main.tsx"></script>
 </body>
