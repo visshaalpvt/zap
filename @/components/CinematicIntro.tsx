@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import introVideo from '../../assets/vetrivelan-intro.mp4';
 import './CinematicIntro.css';
 
@@ -8,7 +8,6 @@ interface CinematicIntroProps {
 
 export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
   const [isExiting, setIsExiting] = useState<boolean>(false);
-  const [isAutoplayBlocked, setIsAutoplayBlocked] = useState<boolean>(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const progressFillRef = useRef<HTMLDivElement | null>(null);
@@ -26,78 +25,73 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
     }, 700);
   }, [isExiting, onEnter]);
 
-  // Ensure audio is fully unmuted and playing
-  const enableAudio = useCallback(() => {
+  // Ensure audio is unmuted and at full volume
+  const ensureAudioOn = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
-
     video.muted = false;
     video.volume = 1;
-    setIsAutoplayBlocked(false);
-
     if (video.paused) {
       video.play().catch(() => {});
     }
   }, []);
 
-  // Keyboard accessibility
+  // Keyboard accessibility: Enter transitions into portfolio
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         handleEnter();
       } else {
-        enableAudio();
+        ensureAudioOn();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleEnter, enableAudio]);
+  }, [handleEnter, ensureAudioOn]);
 
-  // Play unmuted on mount; if browser autoplay policy blocks unmuted audio on cold start,
-  // show prompt and unlock immediately on the very first touch/click anywhere on screen
+  // Direct, automatic unmuted audio playback on page load
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     video.muted = false;
+    video.defaultMuted = false;
     video.volume = 1;
 
-    const startPlayback = async () => {
+    const playVideoAutomatically = async () => {
       try {
         await video.play();
-        setIsAutoplayBlocked(false);
       } catch {
-        // Browser requires a user gesture for sound:
-        // Start video running and show prompt so user knows sound is 1 tap away
+        // If the browser enforces a zero-gesture autoplay block on cold load,
+        // run playback and silently activate full audio on the earliest gesture without showing any prompts
         video.muted = true;
         try {
           await video.play();
         } catch {
-          // Play failed
+          // Playback error
         }
-        setIsAutoplayBlocked(true);
 
-        const onUserGesture = () => {
+        const silentUnmute = () => {
           if (videoRef.current) {
             videoRef.current.muted = false;
             videoRef.current.volume = 1;
             videoRef.current.play().catch(() => {});
           }
-          setIsAutoplayBlocked(false);
-
-          window.removeEventListener('pointerdown', onUserGesture);
-          window.removeEventListener('touchstart', onUserGesture);
-          window.removeEventListener('click', onUserGesture);
+          window.removeEventListener('pointerdown', silentUnmute);
+          window.removeEventListener('touchstart', silentUnmute);
+          window.removeEventListener('click', silentUnmute);
+          window.removeEventListener('keydown', silentUnmute);
         };
 
-        window.addEventListener('pointerdown', onUserGesture, { once: true, passive: true });
-        window.addEventListener('touchstart', onUserGesture, { once: true, passive: true });
-        window.addEventListener('click', onUserGesture, { once: true, passive: true });
+        window.addEventListener('pointerdown', silentUnmute, { once: true, passive: true });
+        window.addEventListener('touchstart', silentUnmute, { once: true, passive: true });
+        window.addEventListener('click', silentUnmute, { once: true, passive: true });
+        window.addEventListener('keydown', silentUnmute, { once: true, passive: true });
       }
     };
 
-    startPlayback();
+    playVideoAutomatically();
   }, []);
 
   // Direct DOM update for progress bar to eliminate React re-render lag
@@ -127,7 +121,7 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
       role="dialog"
       aria-modal="true"
       aria-label="Vetrivelan DM Introduction"
-      onClick={enableAudio}
+      onClick={ensureAudioOn}
     >
       {/* Fullscreen Video Background */}
       <div className="intro-fullscreen-video-container" role="presentation">
@@ -145,26 +139,6 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
         />
         <div className="intro-fullscreen-overlay" aria-hidden="true" />
       </div>
-
-      {/* If browser autoplay policy blocked sound on cold load, prominent prompt to unlock audio */}
-      {isAutoplayBlocked && (
-        <button
-          type="button"
-          className="intro-unmute-prompt"
-          onClick={(e) => {
-            e.stopPropagation();
-            enableAudio();
-          }}
-          aria-label="Tap to enable audio"
-        >
-          <svg className="intro-prompt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
-            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-          </svg>
-          <span>TAP ANYWHERE FOR SOUND</span>
-        </button>
-      )}
 
       {/* Subtle Corner Architectural Accents */}
       <div className="intro-corner-accent intro-corner-tl" aria-hidden="true" />
@@ -186,7 +160,7 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
             className="intro-audio-btn is-unmuted"
             onClick={(e) => {
               e.stopPropagation();
-              enableAudio();
+              ensureAudioOn();
             }}
             role="button"
             tabIndex={0}
