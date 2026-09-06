@@ -179,25 +179,59 @@
 .intro-audio-btn.is-unmuted {
   border-color: rgba(200, 244, 90, 0.8);
   color: #ffffff;
+  background: rgba(13, 11, 23, 0.85);
   box-shadow: 0 0 16px rgba(200, 244, 90, 0.25);
+}
+
+.intro-audio-btn.is-muted {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #F5F3FF;
+  background: rgba(13, 11, 23, 0.85);
+}
+
+.intro-audio-btn.is-muted:hover {
+  border-color: var(--intro-lime);
+  background: rgba(76, 29, 149, 0.7);
+  transform: translateY(-1px);
 }
 
 .intro-audio-icon {
   width: 14px;
   height: 14px;
-  fill: currentColor;
   display: inline-block;
   flex-shrink: 0;
 }
 
-.intro-audio-pulse {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--intro-lime);
+.intro-audio-wave {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 12px;
   margin-left: 2px;
-  animation: introPulse 1.6s infinite ease-in-out;
+}
+
+.intro-audio-wave span {
+  display: inline-block;
+  width: 2px;
+  height: 100%;
+  background: var(--intro-lime);
+  border-radius: 1px;
+  animation: audioWave 1.2s ease-in-out infinite;
+}
+
+.intro-audio-wave span:nth-child(2) {
+  animation-delay: 0.2s;
+  height: 60%;
+}
+
+.intro-audio-wave span:nth-child(3) {
+  animation-delay: 0.4s;
+  height: 80%;
+}
+
+@keyframes audioWave {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
 }
 
 /* Center / Bottom Content Area */
@@ -210,7 +244,8 @@
   text-align: center;
   width: 100%;
   max-width: 800px;
-  margin: auto 0 16px;
+  margin-top: auto;
+  margin-bottom: 24px;
   padding: 0 16px;
   box-sizing: border-box;
 }
@@ -316,7 +351,7 @@
 /* Mobile & Touch Viewport Optimizations */
 @media (max-width: 768px) {
   .cinematic-intro-wrapper {
-    padding: 14px 16px 18px;
+    padding: 16px 16px 18px;
   }
 
   .intro-corner-accent {
@@ -328,9 +363,9 @@
   .intro-corner-bl { bottom: 10px; left: 10px; }
   .intro-corner-br { bottom: 10px; right: 10px; }
 
-  /* Perfectly center the speaker face in portrait viewports */
+  /* Perfectly center the speaker face in tablet portrait viewports */
   .intro-fullscreen-video {
-    object-position: 42% 28%;
+    object-position: center 32%;
   }
 
   .intro-header-bar {
@@ -348,8 +383,9 @@
   }
 
   .intro-main-content {
-    margin: auto 0 10px;
-    padding: 0 8px;
+    margin-top: auto;
+    margin-bottom: 18px;
+    padding: 0 12px;
   }
 
   .intro-actions {
@@ -360,8 +396,8 @@
     width: 100%;
     max-width: 280px;
     padding: 13px 24px;
-    font-size: 12.5px;
-    min-height: 48px;
+    font-size: 12px;
+    min-height: 46px;
     border-radius: 6px;
   }
 
@@ -373,16 +409,46 @@
 
 @media (max-width: 480px) {
   .cinematic-intro-wrapper {
-    padding: 12px 12px 14px;
+    padding: 14px 12px 14px;
   }
 
-  /* Fine-tuned centering for narrow phones */
+  /* Perfectly center the speaker horizontally and frame his face with headroom */
   .intro-fullscreen-video {
-    object-position: 40% 25%;
+    object-position: center 34%;
+  }
+
+  .intro-header-bar {
+    padding: 0;
+  }
+
+  .intro-system-tag {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+  }
+
+  .intro-audio-btn {
+    padding: 5px 10px;
+    font-size: 9px;
+    gap: 4px;
+  }
+
+  .intro-main-content {
+    margin-top: auto;
+    margin-bottom: 14px;
+    padding: 0 8px;
   }
 
   .intro-btn-enter {
-    max-width: 100%;
+    width: 100%;
+    max-width: 250px;
+    padding: 11px 18px;
+    font-size: 11px;
+    min-height: 42px;
+  }
+
+  .intro-footer-bar {
+    font-size: 7.5px;
+    letter-spacing: 0.06em;
   }
 }
 
