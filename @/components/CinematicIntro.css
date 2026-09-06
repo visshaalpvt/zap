@@ -71,16 +71,15 @@
   will-change: transform;
 }
 
-/* Subtle Cinematic Vignette Overlay to ensure text readability */
+/* Minimal subtle vignette - leaves the entire subject clear and unobstructed */
 .intro-fullscreen-overlay {
   position: absolute;
   inset: 0;
   z-index: 2;
   pointer-events: none;
   background: 
-    linear-gradient(180deg, rgba(13, 11, 23, 0.85) 0%, rgba(13, 11, 23, 0.3) 20%, transparent 40%),
-    linear-gradient(0deg, #0D0B17 0%, rgba(13, 11, 23, 0.92) 26%, rgba(13, 11, 23, 0.45) 55%, transparent 75%),
-    radial-gradient(circle at 50% 45%, transparent 35%, rgba(13, 11, 23, 0.5) 80%, rgba(13, 11, 23, 0.9) 100%);
+    linear-gradient(180deg, rgba(13, 11, 23, 0.55) 0%, rgba(13, 11, 23, 0.15) 12%, transparent 25%),
+    linear-gradient(0deg, rgba(13, 11, 23, 0.65) 0%, rgba(13, 11, 23, 0.2) 14%, transparent 28%);
 }
 
 /* Corner architectural accents */
@@ -129,26 +128,6 @@
   box-shadow: 0 0 8px var(--intro-lime);
   display: inline-block;
   animation: introPulse 2.4s infinite ease-in-out;
-}
-
-.intro-header-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.intro-video-badge {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.12em;
-  color: rgba(245, 243, 255, 0.85);
-  background: rgba(13, 11, 23, 0.65);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: 4px 10px;
-  border-radius: 4px;
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  pointer-events: none;
 }
 
 .intro-header-right {
@@ -221,7 +200,7 @@
   animation: introPulse 1.6s infinite ease-in-out;
 }
 
-/* Center / Bottom Content */
+/* Center / Bottom Content Area */
 .intro-main-content {
   position: relative;
   z-index: 10;
@@ -231,69 +210,9 @@
   text-align: center;
   width: 100%;
   max-width: 800px;
-  margin: auto 0 8px;
+  margin: auto 0 16px;
   padding: 0 16px;
   box-sizing: border-box;
-}
-
-/* Architect Identifier */
-.intro-architect-id {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.intro-architect-id h2 {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(12px, 1.4vw, 14px);
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  color: var(--intro-text);
-  margin: 0;
-  text-transform: uppercase;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-}
-
-.intro-architect-id .id-rule {
-  width: 24px;
-  height: 1px;
-  background: rgba(139, 92, 246, 0.5);
-}
-
-/* Intro Typography */
-.intro-meta-block {
-  margin-top: 2px;
-}
-
-.intro-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(22px, 3.6vw, 34px);
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: #FFFFFF;
-  margin: 0 0 6px;
-  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.9);
-}
-
-.intro-statement {
-  font-family: 'Manrope', sans-serif;
-  font-size: clamp(14px, 1.8vw, 16px);
-  font-weight: 400;
-  color: rgba(245, 243, 255, 0.88);
-  margin: 0 0 10px;
-  letter-spacing: -0.01em;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
-}
-
-.intro-pillars {
-  font-family: 'DM Mono', monospace;
-  font-size: clamp(9.5px, 1.2vw, 11px);
-  letter-spacing: 0.18em;
-  color: var(--intro-lime);
-  text-transform: uppercase;
-  text-shadow: 0 0 12px rgba(200, 244, 90, 0.35);
 }
 
 /* CTA Actions */
@@ -301,7 +220,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 0;
   width: 100%;
 }
 
@@ -410,23 +329,11 @@
   .intro-corner-br { bottom: 10px; right: 10px; }
 
   .intro-fullscreen-video {
-    /* Keep speaker centered nicely in portrait viewports */
     object-position: center 32%;
-  }
-
-  .intro-fullscreen-overlay {
-    background: 
-      linear-gradient(180deg, rgba(13, 11, 23, 0.88) 0%, rgba(13, 11, 23, 0.35) 20%, transparent 42%),
-      linear-gradient(0deg, #0D0B17 0%, rgba(13, 11, 23, 0.94) 34%, rgba(13, 11, 23, 0.5) 60%, transparent 80%),
-      radial-gradient(circle at 50% 40%, transparent 25%, rgba(13, 11, 23, 0.55) 75%, rgba(13, 11, 23, 0.92) 100%);
   }
 
   .intro-header-bar {
     font-size: 8.5px;
-  }
-
-  .intro-header-center {
-    display: none;
   }
 
   .intro-location-tag {
@@ -440,48 +347,17 @@
   }
 
   .intro-main-content {
-    margin: auto 0 6px;
+    margin: auto 0 10px;
     padding: 0 8px;
   }
 
-  .intro-architect-id {
-    margin-bottom: 6px;
-    gap: 8px;
-  }
-
-  .intro-architect-id h2 {
-    font-size: 11px;
-    letter-spacing: 0.18em;
-  }
-
-  .intro-architect-id .id-rule {
-    width: 16px;
-  }
-
-  .intro-title {
-    font-size: clamp(19px, 5.2vw, 24px);
-    margin-bottom: 4px;
-    letter-spacing: -0.01em;
-  }
-
-  .intro-statement {
-    font-size: 13.5px;
-    margin-bottom: 8px;
-  }
-
-  .intro-pillars {
-    font-size: 9px;
-    letter-spacing: 0.14em;
-  }
-
   .intro-actions {
-    margin-top: 14px;
     width: 100%;
   }
 
   .intro-btn-enter {
     width: 100%;
-    max-width: 290px;
+    max-width: 280px;
     padding: 13px 24px;
     font-size: 12.5px;
     min-height: 48px;
@@ -497,14 +373,6 @@
 @media (max-width: 480px) {
   .cinematic-intro-wrapper {
     padding: 12px 12px 14px;
-  }
-
-  .intro-title {
-    font-size: 18px;
-  }
-
-  .intro-statement {
-    font-size: 12.5px;
   }
 
   .intro-btn-enter {

@@ -11,7 +11,6 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isExiting, setIsExiting] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [hasEnded, setHasEnded] = useState<boolean>(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const progressFillRef = useRef<HTMLDivElement | null>(null);
@@ -69,7 +68,7 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleEnter]);
 
-  // High performance playback initialization without blocking the main thread
+  // High performance playback initialization
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -116,7 +115,7 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
     startPlayback();
   }, []);
 
-  // Direct DOM update for progress bar to prevent 60fps React re-renders and eliminate lag
+  // Direct DOM update for progress bar to prevent re-renders
   const handleTimeUpdate = () => {
     const video = videoRef.current;
     const progressFill = progressFillRef.current;
@@ -129,12 +128,13 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
     }
   };
 
+  // When video completes, directly enter the portfolio automatically
   const handleVideoEnded = () => {
-    setHasEnded(true);
     setIsPlaying(false);
     if (progressFillRef.current) {
       progressFillRef.current.style.width = '100%';
     }
+    handleEnter();
   };
 
   return (
@@ -173,17 +173,11 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
       <div className="intro-corner-accent intro-corner-bl" aria-hidden="true" />
       <div className="intro-corner-accent intro-corner-br" aria-hidden="true" />
 
-      {/* Top Architectural Header Bar */}
+      {/* Top Architectural Header Bar (Badge removed as requested) */}
       <header className="intro-header-bar">
         <div className="intro-system-tag">
           <span className="intro-pulse-dot" aria-hidden="true" />
           <span>SYSTEM / INTRO</span>
-        </div>
-
-        <div className="intro-header-center">
-          <span className="intro-video-badge" aria-hidden="true">
-            {hasEnded ? 'INTRO COMPLETED' : isPlaying ? 'LIVE INTRODUCTION' : 'READY'}
-          </span>
         </div>
 
         <div className="intro-header-right">
@@ -220,23 +214,8 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({ onEnter }) => {
         </div>
       </header>
 
-      {/* Center / Bottom Content */}
+      {/* Bottom CTA Actions - Middle text barrier removed so video is clear and unobstructed */}
       <main className="intro-main-content">
-        <div className="intro-architect-id">
-          <div className="id-rule" aria-hidden="true" />
-          <h2>Vetrivelan DM</h2>
-          <div className="id-rule" aria-hidden="true" />
-        </div>
-
-        <div className="intro-meta-block">
-          <h1 className="intro-title">PRODUCT SECURITY ARCHITECT</h1>
-          <p className="intro-statement">&ldquo;Securing products. Architecting trust.&rdquo;</p>
-          <div className="intro-pillars">
-            SYSTEMS &bull; SECURITY &bull; TRUST
-          </div>
-        </div>
-
-        {/* Primary CTA Action */}
         <div className="intro-actions">
           <button
             type="button"
